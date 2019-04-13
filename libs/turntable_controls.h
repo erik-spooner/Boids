@@ -1,15 +1,19 @@
 #pragma once
 #include "io.h"
+#include "BoidsSimulation.h"
 
 template <typename CameraT>
 class TurnTableControls {
     public:
         TurnTableControls(
             io::Window &w,
-            CameraT &c
+            CameraT &c,
+            BoidsSimulation *sim
         ) : m_window(w)
           , m_camera(c)
         {
+          simulation = sim;
+          
           m_window.keyboardCommands()
               | io::Key(GLFW_KEY_ESCAPE,
                   [&](auto const &/*event*/) { m_window.shouldClose(); })
@@ -22,7 +26,14 @@ class TurnTableControls {
                   [&](auto const &event) {
                     if (event.action == GLFW_PRESS)
                         yLock = !yLock;
-                  });
+                  })
+              | io::Key(GLFW_KEY_SPACE,
+                    [&](auto const &event) {
+                      if (event.action == GLFW_PRESS) {
+                        simulation->forceToCenter = !simulation->forceToCenter;
+                        std::cout << "force to center " << simulation->forceToCenter << std::endl;
+                      }
+                    });
 
           m_window.mouseCommands() | //
               io::MouseButton(     //
@@ -66,4 +77,6 @@ class TurnTableControls {
         bool cursorZoom = false;
         bool xLock = false;
         bool yLock = false;
+  
+        BoidsSimulation* simulation;
 }; // end turntable camera controls

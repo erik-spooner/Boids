@@ -4,9 +4,6 @@
 #ifndef Grid_h
 #define Grid_h
 
-#define GRIDSIZE 200
-#define CELLWIDTH 10
-
 #include <stdio.h>
 #include <array>
 #include <vector>
@@ -38,8 +35,11 @@ class Grid {
   
   vec3 gridCenter;
 
+  const int gridSize;
+  const float cellWidth;
+
 public:
-  Grid();
+  Grid(int size, float width);
   
   // adds a boid to the grid (returns false if the boid cannot be added to the grid)
   bool addBoidToGrid(int boidIndex, const vec3 &position);

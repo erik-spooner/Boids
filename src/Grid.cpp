@@ -24,11 +24,11 @@ void Cell::getBoids(vector<int> &boids, const int &globalTime)
 }
 
 
-Grid::Grid()
+Grid::Grid(int size, float width) : gridSize(size), cellWidth(width)
 {
-  cells.resize(GRIDSIZE * GRIDSIZE * GRIDSIZE);
+  cells.resize(gridSize * gridSize * gridSize);
   
-  float center = (float)(GRIDSIZE * CELLWIDTH) / 2.0f;
+  float center = (float)(gridSize * cellWidth) / 2.0f;
   gridCenter = vec3(center);
 }
 
@@ -36,7 +36,7 @@ Grid::Grid()
 bool Grid::checkBounds(const array<int, 3> &cellIndex)
 {
   for (const int &index : cellIndex)
-    if (index < 0 || index > GRIDSIZE - 1)
+    if (index < 0 || index > gridSize - 1)
       return false;
 
   return true;
@@ -49,15 +49,15 @@ bool Grid::addBoidToGrid(int boidIndex, const vec3 &position)
   array<int, 3> cellIndex;
   vec3 pos = position + gridCenter;
   
-  cellIndex[0] = floor(pos.x / (float) CELLWIDTH);
-  cellIndex[1] = floor(pos.y / (float) CELLWIDTH);
-  cellIndex[2] = floor(pos.z / (float) CELLWIDTH);
+  cellIndex[0] = floor(pos.x / (float) cellWidth);
+  cellIndex[1] = floor(pos.y / (float) cellWidth);
+  cellIndex[2] = floor(pos.z / (float) cellWidth);
 
   if (!checkBounds(cellIndex))
     return false;
 
-  cellIndex[0] *= GRIDSIZE * GRIDSIZE;
-  cellIndex[1] *= GRIDSIZE;
+  cellIndex[0] *= gridSize * gridSize;
+  cellIndex[1] *= gridSize;
 
   
   cells[cellIndex[0] + cellIndex[1] + cellIndex[2]].addBoidToBucket(boidIndex, globalTimestamp);
@@ -72,16 +72,22 @@ void Grid::getBoids(const vec3 &position, const float &radius, vector<int> &boid
   array<int, 3> cellIndex, index;
   vec3 pos = position + gridCenter;
   
-  cellIndex[0] = floor(pos.x / (float) CELLWIDTH);
-  cellIndex[1] = floor(pos.y / (float) CELLWIDTH);
-  cellIndex[2] = floor(pos.z / (float) CELLWIDTH);
+  cellIndex[0] = floor(pos.x / (float) cellWidth);
+  cellIndex[1] = floor(pos.y / (float) cellWidth);
+  cellIndex[2] = floor(pos.z / (float) cellWidth);
 
-  const int indexRadius = ceil(radius / (float) CELLWIDTH);
+  const int indexRadius = ceil(radius / (float) cellWidth);
   
-  for (int radius = 0; radius < indexRadius; ++radius) {
-    for (int x = -radius; x < radius; ++x) {
+  if (checkBounds(cellIndex))
+    cells[cellIndex[0] * gridSize * gridSize + cellIndex[1] * gridSize + cellIndex[2]].getBoids(boids, globalTimestamp);
+  
+  for (int radius = 1; radius <= indexRadius; ++radius) {
+    if (boids.size() > 15)
+      return;
+    
+    for (int x = -radius; (x <= radius) || (x == 0); ++x) {
       int yRange = radius - abs(x);
-      for (int y = -yRange; y < yRange; ++y) {
+      for (int y = -yRange; (y <= yRange) || (y == 0); ++y) {
         int z = radius - abs(x) - abs(y);
         
         index[0] = cellIndex[0] + x;
@@ -89,32 +95,15 @@ void Grid::getBoids(const vec3 &position, const float &radius, vector<int> &boid
         index[2] = cellIndex[2] + z;
         
         if (checkBounds(index))
-          cells[index[0] * GRIDSIZE * GRIDSIZE + index[1] * GRIDSIZE + index[2]].getBoids(boids, globalTimestamp);
+          cells[index[0] * gridSize * gridSize + index[1] * gridSize + index[2]].getBoids(boids, globalTimestamp);
         
         index[2] = cellIndex[2] - z;
         
-        if (checkBounds(index))
-          cells[index[0] * GRIDSIZE * GRIDSIZE + index[1] * GRIDSIZE + index[2]].getBoids(boids, globalTimestamp);
-
-        if (boids.size() > 10)
-          return;
+        if (checkBounds(index) && z != 0)
+          cells[index[0] * gridSize * gridSize + index[1] * gridSize + index[2]].getBoids(boids, globalTimestamp);
       }
     }
-    
-    
   }
-  
-
-//  maxIndex[0] = cellIndex[0] + indexRadius;
-//  maxIndex[1] = cellIndex[1] + indexRadius;
-//  maxIndex[2] = cellIndex[2] + indexRadius;
-//
-//  // iterate through all the valid indices and grab the boids that lie within the cell
-//  for (cellIndex[0] = minIndex[0]; cellIndex[0] < maxIndex[0]; ++cellIndex[0])
-//    for (cellIndex[1] = minIndex[1]; cellIndex[1] < maxIndex[1]; ++cellIndex[1])
-//      for (cellIndex[2] = minIndex[2]; cellIndex[2] < maxIndex[2]; ++cellIndex[2])
-//        if (checkBounds(cellIndex))
-//          cells[cellIndex[0] * GRIDSIZE * GRIDSIZE + cellIndex[1] * GRIDSIZE + cellIndex[2]].getBoids(boids, globalTimestamp);
 }
 
 

@@ -27,8 +27,8 @@ class Boid
   
   float mass = 1.0;
   
-  const float maxVelocity = 50.0;
-  const float minVelocity = 25.0;
+  const float maxVelocity = 20.0;
+  const float minVelocity = 6.0;
 
 public:
   

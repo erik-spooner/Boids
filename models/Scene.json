@@ -1,0 +1,7 @@
+{
+	"numBoids": 5000,
+	"avoidenceDistance": 1,
+	"cohesionDistance": 3,
+	"gatheringDistance": 5,
+	"numIterations" : 1  
+}

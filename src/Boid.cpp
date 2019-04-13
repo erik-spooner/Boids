@@ -19,8 +19,8 @@ Boid::~Boid()
 void Boid::move(float dt)
 {
   // If there is enough force update the normal
-  if (length(force) > 0.0001)
-    normal = normalize(-force);
+  normal = normalize(force + vec3(0.0, 9.81, 0.0));
+  
   
   // Update the velocity using
   // a = F / m
@@ -72,20 +72,20 @@ vec3 Boid::getNormal() const
 mat4f Boid::getTransform() const
 {
   // B N T X
-  
   vec3 binormal = normalize(cross(tangent, normal));
   if (binormal.x != binormal.x || binormal.y != binormal.y || binormal.z != binormal.z)
     binormal = vec3(1.0, 0.0, 0.0);
   
-  vec3 modifiedTangent = normalize(cross(normal, binormal));
+  vec3 modifiedNormal = normalize(cross(binormal, tangent));
   
   mat4f transform = mat4f(1.0);
   
-//  transform[0] = vec4(binormal, 0.0);
-//  transform[1] = vec4(normal, 0.0);
-//  transform[2] = vec4(modifiedTangent, 0.0);
+  transform[0] = vec4(binormal, 0.0);
+  transform[1] = vec4(modifiedNormal, 0.0);
+  transform[2] = vec4(tangent, 0.0);
+  transform[3] = vec4(position, 1.0);
   
-  transform = translate(transform, position);
+//  transform = translate(transform, position);
 
   return transform;
 }
