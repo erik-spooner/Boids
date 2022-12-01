@@ -21,7 +21,7 @@ class BoidsSimulation {
   
   PhongStyle::InstancedRenderContext boidInstacedRenerable;
   
-  const int numBoids = 7500;
+  const int numBoids = 100;
   const int iterations = 1;
   
   const float avoidenceDistance = 1;

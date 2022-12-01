@@ -1,5 +1,5 @@
 {
-	"numBoids": 5000,
+	"numBoids": 1500,
 	"avoidenceDistance": 1,
 	"cohesionDistance": 3,
 	"gatheringDistance": 5,
